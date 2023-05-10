@@ -19,14 +19,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('auth/login', [AuthController::class, 'login']);
+
+
 Route::group([
 
-    'middleware' => 'api',
+    'middleware' => 'auth:api',
     'prefix' => 'auth'
 
 ], function ($router) {
 
-    Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('me', [AuthController::class, 'me']);
@@ -35,7 +37,7 @@ Route::group([
 
 Route::group([
 
-    'middleware' => 'api',
+    'middleware' => 'auth:api',
     'prefix' => 'cliente'
 
 ], function ($router) {
@@ -48,7 +50,7 @@ Route::group([
 
 Route::group([
 
-    'middleware' => 'api',
+    'middleware' => 'auth:api',
     'prefix' => 'producto'
 
 ], function ($router) {
@@ -61,7 +63,7 @@ Route::group([
 
 Route::group([
 
-    'middleware' => 'api',
+    'middleware' => 'auth:api',
     'prefix' => 'venta'
 
 ], function ($router) {
