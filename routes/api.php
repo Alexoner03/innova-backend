@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdelantoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProductoController;
@@ -66,5 +67,6 @@ Route::group([
 ], function ($router) {
 
     Route::get('/', [TotalVentaController::class, 'index']);
+    Route::get('/adelanto', [AdelantoController::class, 'findBySerie']);
 
 });
