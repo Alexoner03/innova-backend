@@ -17,8 +17,8 @@ class TotalVentaController extends Controller
         $cliente = $fields["cliente"] ?? null;
 
         $query = TotalVenta::where("credito", "CREDITO")->where("entregado", "SI");
-
-        if (auth()->user()->cargo !== "ADMIN") {
+        $user = auth()->user();
+        if ($user && $user->cargo !== "ADMIN") {
             $query = $query->where("vendedor", auth()->user()->nombre);
         }
 
