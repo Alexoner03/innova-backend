@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TotalPedido;
 use App\Models\TotalVenta;
+use Illuminate\Database\Grammar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TotalVentaController extends Controller
 {
@@ -27,5 +30,23 @@ class TotalVentaController extends Controller
         }
 
         return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas')->get());
+    }
+
+    function store(Request $request) {
+/*        $validated = $request->validate([
+            "comment" =>     "string|nullable",
+            "client" =>      "string|required",
+            "products" =>    "required|array|min:1",
+            "products.*.cant" => "numeric|required",
+            "products.*.id" => "numeric|required",
+            "products.*.price" => "numeric|required",
+        ]);*/
+        /*DB::raw("SELECT MAX(seriepedido) FROM total_pedido");*/
+        $lastSeriePedido = DB::table("total_pedido")
+            ->select(DB::raw("MAX(seriepedido) as max"))
+            ->get();
+
+        $last = intval($lastSeriePedido[0]->max) + 1;
+        $next = str_pad($last, 7,"0000000", STR_PAD_LEFT);
     }
 }

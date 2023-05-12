@@ -70,5 +70,6 @@ Route::group([
 
     Route::get('/', [TotalVentaController::class, 'index']);
     Route::get('/adelanto', [AdelantoController::class, 'findBySerie']);
+    Route::post("/", [TotalVentaController::class, 'store']);
 
 });

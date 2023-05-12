@@ -10,4 +10,5 @@ class Adelanto extends Model
     use HasFactory;
 
     protected $primaryKey = "idadelantos";
+    protected $table = "adelantos";
 }

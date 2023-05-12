@@ -10,7 +10,7 @@ class ProductoController extends Controller
     function listAll() {
 
         return response()->json(
-            Producto::select("producto", "p_especial", "stock_real", "id", "cant_caja", "codigo")
+            Producto::select("id","producto", "p_especial", "stock_real", "id", "cant_caja", "codigo")
                 ->where("activo", "SI")
                 ->get()
         );
@@ -23,7 +23,7 @@ class ProductoController extends Controller
 
 
         return response()->json(
-            Producto::select("producto", "p_especial", "stock_real", "id", "cant_caja", "codigo")
+            Producto::select("id","producto", "p_especial", "stock_real", "id", "cant_caja", "codigo")
                 ->where("activo", "SI")
                 ->where("producto", "like", "%".$validated["value"]."%")
                 ->take(12)
