@@ -10,4 +10,6 @@ class TotalVenta extends Model
     use HasFactory;
 
     protected $table = "total_ventas";
+    protected $guarded = [];
+
 }

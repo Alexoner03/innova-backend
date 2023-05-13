@@ -11,4 +11,6 @@ class Pedido extends Model
 
     protected $primaryKey = "id_pedido";
     protected $table = "pedido";
+
+    protected $guarded = [];
 }

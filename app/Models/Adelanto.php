@@ -11,4 +11,6 @@ class Adelanto extends Model
 
     protected $primaryKey = "idadelantos";
     protected $table = "adelantos";
+    protected $guarded = [];
+
 }
