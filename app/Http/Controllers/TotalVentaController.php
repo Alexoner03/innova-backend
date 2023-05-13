@@ -127,7 +127,7 @@ class TotalVentaController extends Controller
             return response()->json([
                 "result" => false,
                 "message" => ""
-            ]);
+            ], 422);
         }
 
     }

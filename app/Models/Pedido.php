@@ -13,4 +13,7 @@ class Pedido extends Model
     protected $table = "pedido";
 
     protected $guarded = [];
+
+    public $timestamps = false;
+
 }

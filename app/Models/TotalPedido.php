@@ -12,5 +12,5 @@ class TotalPedido extends Model
     protected $table = "total_pedido";
     protected $primaryKey = "id_ped_total";
     protected $guarded = [];
-
+    public $timestamps = false;
 }
