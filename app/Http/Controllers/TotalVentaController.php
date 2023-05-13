@@ -38,14 +38,16 @@ class TotalVentaController extends Controller
 
     function store(Request $request)
     {
+
         $validated = $request->validate([
             "comment" => "string|nullable",
-            "client" => "numeric|required",
+            "client" => "numeric|required|exists:cliente,id_cliente",
             "products" => "required|array|min:1",
             "products.*.cant" => "numeric|required",
             "products.*.id" => "numeric|required",
             "products.*.price" => "numeric|required",
         ]);
+
         //usuario autenticado
         $user = auth()->user();
 
