@@ -42,8 +42,8 @@ Route::group([
 
 ], function ($router) {
 
-    Route::get('/', [ClienteController::class, 'listAll']);
     Route::get('/filter', [ClienteController::class, 'filter']);
+    Route::get('/', [ClienteController::class, 'listAll']);
 
 });
 
@@ -55,8 +55,8 @@ Route::group([
 
 ], function ($router) {
 
-    Route::get('/', [ProductoController::class, 'listAll']);
     Route::get('/filter', [ProductoController::class, 'filter']);
+    Route::get('/', [ProductoController::class, 'listAll']);
 
 });
 
@@ -68,8 +68,9 @@ Route::group([
 
 ], function ($router) {
 
-    Route::get('/', [TotalVentaController::class, 'index']);
     Route::get('/adelanto', [AdelantoController::class, 'findBySerie']);
+    Route::post("/adelanto", [AdelantoController::class, 'store']);
+    Route::get('/', [TotalVentaController::class, 'index']);
     Route::post("/", [TotalVentaController::class, 'store']);
 
 });
