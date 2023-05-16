@@ -44,6 +44,7 @@ Route::group([
 
     Route::get('/filter', [ClienteController::class, 'filter']);
     Route::get('/', [ClienteController::class, 'listAll']);
+    Route::post('/', [ClienteController::class, 'store']);
 
 });
 
