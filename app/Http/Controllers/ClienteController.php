@@ -20,7 +20,6 @@ class ClienteController extends Controller
                     ->where("ruc", "like", "%".$validated["value"]."%")
                     ->where("tipo", "FERRETERIA")
                     ->where("activo", "<>", "ANULADO")
-                    ->take(10)
                     ->get()
             );
         }
@@ -30,7 +29,6 @@ class ClienteController extends Controller
                 ->where("cliente", "like", "%".$validated["value"]."%")
                 ->where("tipo", "FERRETERIA")
                 ->where("activo", "<>", "ANULADO")
-                ->take(10)
                 ->get());
     }
 

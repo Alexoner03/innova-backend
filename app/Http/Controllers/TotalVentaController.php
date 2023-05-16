@@ -131,4 +131,55 @@ class TotalVentaController extends Controller
         }
 
     }
+
+    function recordClient(Request $request) {
+        $validated = $request->validate([
+            "cliente" =>    "required|string",
+            "year" =>       "required|numeric|digits:4|min:2015",
+        ]);
+        $months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+        $totals = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $total = TotalVenta::where('ruc', $validated['cliente'])
+                ->where('entregado', 'SI')
+                ->where(DB::raw('YEAR(fecha)'), $validated['year'])
+                ->where(DB::raw('MONTH(fecha)'), $i)
+                ->select(DB::raw('coalesce(sum(total), 0) as total'))
+                ->first();
+
+            $totals[] = [
+              "total" => $total->total,
+              "month" => $months[$i -1]
+            ];
+        }
+
+        return response()->json($totals);
+    }
+
+    function recordSeller(Request $request) {
+        $validated = $request->validate([
+            "seller" =>    "required|string",
+            "year" =>       "required|numeric|digits:4|min:2015",
+        ]);
+
+        $months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+        $totals = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $total = TotalVenta::where('vendedor', $validated['seller'])
+                ->where('entregado', 'SI')
+                ->where(DB::raw('YEAR(fecha)'), $validated['year'])
+                ->where(DB::raw('MONTH(fecha)'), $i)
+                ->select(DB::raw('coalesce(sum(total), 0) as total'))
+                ->first();
+
+            $totals[] = [
+                "total" => $total->total,
+                "month" => $months[$i -1]
+            ];
+        }
+
+        return response()->json($totals);
+    }
 }
