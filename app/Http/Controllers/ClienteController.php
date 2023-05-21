@@ -66,11 +66,11 @@ class ClienteController extends Controller
 
             $cliente = new Cliente();
 
-            $cliente->ruc = $validated["ruc"];
-            $cliente->cliente = $validated["cliente"];
-            $cliente->direccion = $validated["direccion"];
-            $cliente->celular = $validated["telefono"];
-            $cliente->representante = $validated["representante"];
+            $cliente->ruc = str($validated["ruc"])->upper();
+            $cliente->cliente = str($validated["cliente"])->upper();
+            $cliente->direccion = str($validated["direccion"])->upper();
+            $cliente->celular = str($validated["telefono"])->upper();
+            $cliente->representante = str($validated["representante"])->upper();
             $cliente->tipo = "FERRETERIA";
             $cliente->activo = "SI";
 

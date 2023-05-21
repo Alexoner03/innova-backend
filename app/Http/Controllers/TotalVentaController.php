@@ -33,7 +33,7 @@ class TotalVentaController extends Controller
             $query = $query->where("cliente", 'like', "%$cliente%");
         }
 
-        return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas')->get());
+        return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')->get());
     }
 
     function store(Request $request)
@@ -89,6 +89,7 @@ class TotalVentaController extends Controller
             $totalPedido->vendedor = $user->nombre;
             $totalPedido->comentario = $validated["comment"] ?? "";
             $totalPedido->credito = $client->credito;
+            $totalPedido->documento = "PROFORMA";
 
             $totalPedido->save();
 

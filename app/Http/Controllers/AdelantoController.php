@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ACuenta;
 use App\Models\Adelanto;
+use App\Models\TotalPedido;
+use App\Models\TotalVenta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,13 +38,14 @@ class AdelantoController extends Controller
         try {
             foreach ($validated["adelantos"] as $adelanto)
             {
+
                 $acuenta = new ACuenta();
                 $acuenta->serie = $adelanto["serie"];
                 $acuenta->vendedor = auth()->user()->nombre;
                 $acuenta->cliente = $adelanto["cliente"];
                 $acuenta->monto = $adelanto["acuenta"];
                 $acuenta->fecha = date("Y-m-d");
-                $acuenta->pendiente = $adelanto["pendiente"];
+                $acuenta->pendiente = $adelanto["pendiente"] < $adelanto["acuenta"] ? "SI" : "NO";
 
                 $acuenta->save();
             }
