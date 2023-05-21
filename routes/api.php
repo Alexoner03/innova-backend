@@ -71,6 +71,7 @@ Route::group([
 
     Route::get('/adelanto', [AdelantoController::class, 'findBySerie']);
     Route::post("/adelanto", [AdelantoController::class, 'store']);
+    Route::get("/detalle", [TotalVentaController::class, 'listDetail']);
     Route::get('/', [TotalVentaController::class, 'index']);
     Route::post("/", [TotalVentaController::class, 'store']);
 

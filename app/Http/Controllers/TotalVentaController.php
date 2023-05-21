@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\Devolucion;
+use App\Models\NotaPedido;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\TotalPedido;
@@ -34,6 +36,42 @@ class TotalVentaController extends Controller
         }
 
         return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')->get());
+    }
+
+    public function listDetail(Request $request)
+    {
+        $fields = $request->validate([
+            'serie' => 'string|exists:total_ventas,serieventas'
+        ]);
+
+        $details = NotaPedido::where('serienota', $fields['serie'])->get();
+        $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
+
+        $result = [];
+
+        foreach ($details as $item) {
+            $result[] = [
+                "cantidad" =>   $item->cantidad,
+                "producto" =>   $item->producto,
+                "unitario" =>   $item->unitario,
+                "importe" =>    $item->importe,
+                "id" =>         $item->id,
+                "estado" =>     "normal",
+            ];
+        }
+
+        foreach ($details2 as $item) {
+            $result[] = [
+                "cantidad" =>   $item->cantidad,
+                "producto" =>   $item->producto,
+                "unitario" =>   $item->unitario,
+                "importe" =>    $item->importe,
+                "id" =>         $item->id,
+                "estado" =>     "devolucion",
+            ];
+        }
+
+        return response()->json($result);
     }
 
     function store(Request $request)
