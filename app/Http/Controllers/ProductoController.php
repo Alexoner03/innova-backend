@@ -28,11 +28,9 @@ class ProductoController extends Controller
         $query = Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor" , "stock_real", "id", "cant_caja", "codigo")
             ->where("activo", "SI");
 
-        $query->where(function ($subQuery) use ($splitted) {
-            foreach ($splitted as $word) {
-                $subQuery->orWhere("producto", "like", "%" . $word . "%");
-            }
-        });
+        foreach ($splitted as $word) {
+            $query->where("producto", "like", "%" . $word . "%");
+        }
 
 
         return response()->json(
