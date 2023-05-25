@@ -31,6 +31,7 @@ class AdelantoController extends Controller
             "adelantos.*.acuenta" =>    "required|numeric|min:0",
             "adelantos.*.cliente" =>    "required|string",
             "adelantos.*.serie" =>      "required|string",
+            "adelantos.*.documento" => "required|string"
         ]);
 
         DB::beginTransaction();
@@ -45,7 +46,8 @@ class AdelantoController extends Controller
                 $acuenta->cliente = $adelanto["cliente"];
                 $acuenta->monto = $adelanto["acuenta"];
                 $acuenta->fecha = date("Y-m-d");
-                $acuenta->pendiente = $adelanto["pendiente"] < $adelanto["acuenta"] ? "SI" : "NO";
+                $acuenta->pendiente = "SI";
+                $acuenta->documento = $adelanto["documento"];
 
                 $acuenta->save();
             }

@@ -41,7 +41,7 @@ class TotalVentaController extends Controller
     public function listDetail(Request $request)
     {
         $fields = $request->validate([
-            'serie' => 'string|exists:total_ventas,serieventas'
+            'serie' => 'string'
         ]);
 
         $details = NotaPedido::where('serienota', $fields['serie'])->get();
@@ -79,7 +79,7 @@ class TotalVentaController extends Controller
 
         $validated = $request->validate([
             "comment" => "string|nullable",
-            "client" => "numeric|required|exists:cliente,id_cliente",
+            "client" => "numeric|required",
             "products" => "required|array|min:1",
             "products.*.cant" => "numeric|required",
             "products.*.id" => "numeric|required",
