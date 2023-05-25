@@ -2,6 +2,29 @@
 
 use Illuminate\Support\Str;
 
+function getDB(String $name) {
+    return [
+        'driver' => 'mysql',
+        'url' => env('DATABASE_URL'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '3306'),
+        'database' => $name,
+        'username' => env('DB_USERNAME', 'forge'),
+        'password' => env('DB_PASSWORD', ''),
+        'unix_socket' => env('DB_SOCKET', ''),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'prefix_indexes' => true,
+        'strict' => true,
+        'engine' => null,
+        'options' => extension_loaded('pdo_mysql') ? array_filter([
+            PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+        ]) : [],
+    ];
+}
+
+
 return [
 
     /*
@@ -43,25 +66,30 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'mysql' => [
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
+        'innovaprincipal' => getDB("innovaprincipal"),
+        'castilla' => getDB("castilla"),
+        'castilla2' => getDB("castilla2"),
+        'jauja' => getDB("jauja"),
+        'almacenayacucho' => getDB("almacenayacucho"),
+        'ferreboomlima' => getDB("ferreboomlima"),
+        'tingomaria' => getDB("tingomaria"),
+        'chupaca' => getDB("chupaca"),
+        'pichari' => getDB("pichari"),
+        'recuerdostingomaria' => getDB("recuerdostingomaria"),
+        'vanidositos' => getDB("vanidositos"),
+        'vanidositosbebom' => getDB("vanidositosbebom"),
+        'aquady' => getDB("aquady"),
+        'ferreboompichanaki' => getDB("ferreboompichanaki"),
+        'showroom' => getDB("showroom"),
+        'pichanaki' => getDB("pichanaki"),
+        'jhonsullca' => getDB("jhonsullca"),
+        'clienteferreboom01' => getDB("clienteferreboom01"),
+        'clientepichari01' => getDB("clientepichari01"),
+        'clientepichari02' => getDB("clientepichari02"),
+        'clientepichari03' => getDB("clientepichari03"),
+        'clientepichari04' => getDB("clientepichari04"),
+        'clientepichari05' => getDB("clientepichari05"),
+        'innovaprincipal_bkp' => getDB("innovaprincipal_bkp"),
 
         'pgsql' => [
             'driver' => 'pgsql',

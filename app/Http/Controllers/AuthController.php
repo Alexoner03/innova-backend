@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -25,10 +26,13 @@ class AuthController extends Controller
     {
         $request = request()->validate([
             "usuario" => "string",
-            "password" => "string"
+            "password" => "string",
+            "db" => "string"
         ]);
 
-        $user = User::where("usuario", $request["usuario"])
+        $user = DB::connection($request["db"])
+            ->table("usuario")
+            ->where("usuario", $request["usuario"])
             ->where("password", $request["password"])
             ->where("activo", "SI")
             ->first();
@@ -37,7 +41,17 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $token = auth()->login($user);
+        $userModel = new User();
+        $userModel->id = $user->id;
+        $userModel->usuario = $user->usuario;
+        $userModel->password = $user->password;
+        $userModel->cargo = $user->cargo;
+        $userModel->nombre = $user->nombre;
+        $userModel->activo = $user->activo;
+        $userModel->cumple = $user->cumple;
+        $userModel->celular = $user->celular;
+
+        $token = auth()->claims(['BASE' => $request["db"]])->login($userModel);
 
         return response()->json([
             "auth" => [
@@ -56,7 +70,9 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        $user = auth()->user();
+        $user->db = auth()->payload()->get("BASE");
+        return response()->json($user);
     }
 
     /**

@@ -10,4 +10,10 @@ class Devolucion extends Model
     use HasFactory;
     protected $table = "devoluciones";
     protected $primaryKey = "iddevolucion";
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
 }

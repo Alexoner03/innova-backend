@@ -17,6 +17,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->getKey();
     }
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
+
     public function getJWTCustomClaims()
     {
         return [];

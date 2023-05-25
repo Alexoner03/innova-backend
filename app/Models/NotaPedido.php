@@ -11,4 +11,10 @@ class NotaPedido extends Model
 
     protected $table = "notapedido";
     protected $primaryKey = "idnota";
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
 }

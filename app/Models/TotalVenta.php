@@ -12,4 +12,10 @@ class TotalVenta extends Model
     protected $table = "total_ventas";
     protected $guarded = [];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
+
 }

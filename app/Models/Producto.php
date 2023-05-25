@@ -11,4 +11,10 @@ class Producto extends Model
 
     protected $table = "producto";
     protected $primaryKey = "idventas";
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
 }

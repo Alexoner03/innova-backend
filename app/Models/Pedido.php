@@ -16,4 +16,10 @@ class Pedido extends Model
 
     public $timestamps = false;
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+    }
+
 }
