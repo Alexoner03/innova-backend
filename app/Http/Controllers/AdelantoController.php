@@ -4,14 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\ACuenta;
 use App\Models\Adelanto;
-use App\Models\TotalPedido;
-use App\Models\TotalVenta;
+use Illuminate\Database\Connection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AdelantoController extends Controller
 {
+    private readonly Connection $connection;
+
+    public function __construct()
+    {
+        $connectionLabel = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+        $this->connection = DB::connection($connectionLabel);
+    }
+
     public function findBySerie(Request $request)
     {
         $validated = $request->validate([
@@ -34,7 +41,7 @@ class AdelantoController extends Controller
             "adelantos.*.documento" => "required|string"
         ]);
 
-        DB::beginTransaction();
+        $this->connection->beginTransaction();
 
         try {
             foreach ($validated["adelantos"] as $adelanto)
@@ -51,12 +58,12 @@ class AdelantoController extends Controller
 
                 $acuenta->save();
             }
-            DB::commit();
+            $this->connection->commit();
             return response()->json([
                 "result" => true,
             ]);
         }catch (\Exception $e){
-            DB::rollBack();
+            $this->connection->rollBack();
             Log::error($e);
             return response()->json([
                 "result" => false,

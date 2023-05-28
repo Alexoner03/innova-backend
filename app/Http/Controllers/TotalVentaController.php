@@ -9,6 +9,7 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\TotalPedido;
 use App\Models\TotalVenta;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,13 @@ use Illuminate\Support\Facades\Log;
 
 class TotalVentaController extends Controller
 {
+    private readonly Connection $connection;
+    public function __construct()
+    {
+        $connectionLabel = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
+        $this->connection = DB::connection($connectionLabel);
+    }
+
     public function index(Request $request)
     {
 
@@ -90,8 +98,8 @@ class TotalVentaController extends Controller
         $user = auth()->user();
 
         //ultima serie de pedido
-        $lastSeriePedido = DB::table("total_pedido")
-            ->select(DB::raw("MAX(seriepedido) as max"))
+        $lastSeriePedido = $this->connection->table("total_pedido")
+            ->select($this->connection->raw("MAX(seriepedido) as max"))
             ->get();
         $last = intval($lastSeriePedido[0]->max) + 1;
         $next_serie = str_pad($last, 7, "0000000", STR_PAD_LEFT); //nueva serie a crear
@@ -108,7 +116,7 @@ class TotalVentaController extends Controller
         }, 0);
 
 
-        DB::beginTransaction();
+        $this->connection->beginTransaction();
 
         try {
             $totalPedido = new TotalPedido();
@@ -154,7 +162,7 @@ class TotalVentaController extends Controller
                 $pedido->save();
             }
 
-            DB::commit();
+            $this->connection->commit();
 
             return response()->json([
                 "result" => true,
@@ -162,7 +170,7 @@ class TotalVentaController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            DB::rollBack();
+            $this->connection->rollBack();
             return response()->json([
                 "result" => false,
                 "message" => ""
@@ -182,9 +190,9 @@ class TotalVentaController extends Controller
         for ($i = 1; $i <= 12; $i++) {
             $total = TotalVenta::where('ruc', $validated['cliente'])
                 ->where('entregado', 'SI')
-                ->where(DB::raw('YEAR(fecha)'), $validated['year'])
-                ->where(DB::raw('MONTH(fecha)'), $i)
-                ->select(DB::raw('coalesce(sum(total), 0) as total'))
+                ->where($this->connection->raw('YEAR(fecha)'), $validated['year'])
+                ->where($this->connection->raw('MONTH(fecha)'), $i)
+                ->select($this->connection->raw('coalesce(sum(total), 0) as total'))
                 ->first();
 
             $totals[] = [
@@ -208,9 +216,9 @@ class TotalVentaController extends Controller
         for ($i = 1; $i <= 12; $i++) {
             $total = TotalVenta::where('vendedor', $validated['seller'])
                 ->where('entregado', 'SI')
-                ->where(DB::raw('YEAR(fecha)'), $validated['year'])
-                ->where(DB::raw('MONTH(fecha)'), $i)
-                ->select(DB::raw('coalesce(sum(total), 0) as total'))
+                ->where($this->connection->raw('YEAR(fecha)'), $validated['year'])
+                ->where($this->connection->raw('MONTH(fecha)'), $i)
+                ->select($this->connection->raw('coalesce(sum(total), 0) as total'))
                 ->first();
 
             $totals[] = [
