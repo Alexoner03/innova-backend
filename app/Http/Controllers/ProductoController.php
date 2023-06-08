@@ -13,6 +13,7 @@ class ProductoController extends Controller
         return response()->json(
             Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor", "stock_real", "id", "cant_caja", "codigo")
                 ->where("activo", "SI")
+                ->orderBy("producto", "asc")
                 ->get()
         );
     }

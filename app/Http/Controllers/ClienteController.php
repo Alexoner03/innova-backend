@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-use mysql_xdevapi\Exception;
 
 class ClienteController extends Controller
 {
@@ -18,8 +17,8 @@ class ClienteController extends Controller
             return response()->json(
                 Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
                     ->where("ruc", "like", "%".$validated["value"]."%")
-                    ->where("tipo", "FERRETERIA")
                     ->where("activo", "<>", "ANULADO")
+                    ->orderBy('cliente', "asc")
                     ->get()
             );
         }
@@ -27,16 +26,16 @@ class ClienteController extends Controller
         return response()->json(
             Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
                 ->where("cliente", "like", "%".$validated["value"]."%")
-                ->where("tipo", "FERRETERIA")
                 ->where("activo", "<>", "ANULADO")
+                ->orderBy('cliente', "asc")
                 ->get());
     }
 
     function listAll(Request $request) {
         return response()->json(
             Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
-                ->where("tipo", "FERRETERIA")
                 ->where("activo", "<>", "ANULADO")
+                ->orderBy('cliente', "asc")
                 ->get()
         );
     }
