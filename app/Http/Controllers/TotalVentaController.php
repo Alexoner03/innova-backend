@@ -35,12 +35,18 @@ class TotalVentaController extends Controller
 
         $query = TotalVenta::where("credito", "CREDITO")->where("entregado", "SI");
         $user = auth()->user();
+
         if ($user && $user->cargo !== "ADMIN") {
             $query = $query->where("vendedor", auth()->user()->nombre);
         }
 
-        if (!!$cliente && $cliente !== "") {
-            $query = $query->where("cliente", 'like', "%$cliente%");
+        if (!!$cliente && $cliente !== "")
+        {
+            $splitted = explode(" ", $cliente);
+
+            foreach ($splitted as $word) {
+                $query->where("cliente", "like", "%" . $word . "%");
+            }
         }
 
         return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')->get());
@@ -135,7 +141,6 @@ class TotalVentaController extends Controller
             $totalPedido->vendedor = $user->nombre;
             $totalPedido->comentario = $validated["comment"] ?? "";
             $totalPedido->credito = $client->credito;
-            $totalPedido->documento = "PROFORMA";
 
             $totalPedido->save();
 
@@ -184,6 +189,7 @@ class TotalVentaController extends Controller
             "cliente" =>    "required|string",
             "year" =>       "required|numeric|digits:4|min:2015",
         ]);
+
         $months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
         $totals = [];
 
