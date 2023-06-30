@@ -11,7 +11,7 @@ class ProductoController extends Controller
     {
 
         return response()->json(
-            Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor", "stock_real", "id", "cant_caja", "codigo", "marca")
+            Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor", "stock_real", "id", "cant_caja", "codigo", "marca", "p_compra")
                 ->where("activo", "SI")
                 ->orderBy("producto", "asc")
                 ->get()
@@ -26,7 +26,7 @@ class ProductoController extends Controller
 
         $splitted = explode(" ", $validated["value"]);
 
-        $query = Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor" , "stock_real", "id", "cant_caja", "codigo", "marca")
+        $query = Producto::select("id", "producto", "p_especial", "p_unidad", "p_promotor" , "stock_real", "id", "cant_caja", "codigo", "marca", "p_compra")
             ->where("activo", "SI");
 
         $last_word = array_pop($splitted);
