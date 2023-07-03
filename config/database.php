@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Str;
 
-function getDB(String $name) {
+
+$getdb = function (String $name) {
     return [
         'driver' => 'mysql',
         'url' => env('DATABASE_URL'),
@@ -22,8 +23,7 @@ function getDB(String $name) {
             PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
         ]) : [],
     ];
-}
-
+};
 
 return [
 
@@ -66,30 +66,30 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'innovaprincipal' => getDB("innovaprincipal"),
-        'castilla' => getDB("castilla"),
-        'castilla2' => getDB("castilla2"),
-        'jauja' => getDB("jauja"),
-        'almacenayacucho' => getDB("almacenayacucho"),
-        'ferreboomlima' => getDB("ferreboomlima"),
-        'tingomaria' => getDB("tingomaria"),
-        'chupaca' => getDB("chupaca"),
-        'pichari' => getDB("pichari"),
-        'recuerdostingomaria' => getDB("recuerdostingomaria"),
-        'vanidositos' => getDB("vanidositos"),
-        'vanidositosbebom' => getDB("vanidositosbebom"),
-        'aquady' => getDB("aquady"),
-        'ferreboompichanaki' => getDB("ferreboompichanaki"),
-        'showroom' => getDB("showroom"),
-        'pichanaki' => getDB("pichanaki"),
-        'jhonsullca' => getDB("jhonsullca"),
-        'clienteferreboom01' => getDB("clienteferreboom01"),
-        'clientepichari01' => getDB("clientepichari01"),
-        'clientepichari02' => getDB("clientepichari02"),
-        'clientepichari03' => getDB("clientepichari03"),
-        'clientepichari04' => getDB("clientepichari04"),
-        'clientepichari05' => getDB("clientepichari05"),
-        'innovaprincipal_bkp' => getDB("innovaprincipal_bkp"),
+        'innovaprincipal' => $getdb("innovaprincipal"),
+        'castilla' => $getdb("castilla"),
+        'castilla2' => $getdb("castilla2"),
+        'jauja' => $getdb("jauja"),
+        'almacenayacucho' => $getdb("almacenayacucho"),
+        'ferreboomlima' => $getdb("ferreboomlima"),
+        'tingomaria' => $getdb("tingomaria"),
+        'chupaca' => $getdb("chupaca"),
+        'pichari' => $getdb("pichari"),
+        'recuerdostingomaria' => $getdb("recuerdostingomaria"),
+        'vanidositos' => $getdb("vanidositos"),
+        'vanidositosbebom' => $getdb("vanidositosbebom"),
+        'aquady' => $getdb("aquady"),
+        'ferreboompichanaki' => $getdb("ferreboompichanaki"),
+        'showroom' => $getdb("showroom"),
+        'pichanaki' => $getdb("pichanaki"),
+        'jhonsullca' => $getdb("jhonsullca"),
+        'clienteferreboom01' => $getdb("clienteferreboom01"),
+        'clientepichari01' => $getdb("clientepichari01"),
+        'clientepichari02' => $getdb("clientepichari02"),
+        'clientepichari03' => $getdb("clientepichari03"),
+        'clientepichari04' => $getdb("clientepichari04"),
+        'clientepichari05' => $getdb("clientepichari05"),
+        'innovaprincipal_bkp' => $getdb("innovaprincipal_bkp"),
 
         'pgsql' => [
             'driver' => 'pgsql',

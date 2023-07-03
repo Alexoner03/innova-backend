@@ -73,6 +73,7 @@ Route::group([
     Route::post("/adelanto", [AdelantoController::class, 'store']);
     Route::get("/detalle", [TotalVentaController::class, 'listDetail']);
     Route::get('/', [TotalVentaController::class, 'index']);
+    Route::get('/buscar', [TotalVentaController::class, 'indexSells']);
     Route::post("/", [TotalVentaController::class, 'store']);
 
     Route::get("/reporte-cliente", [TotalVentaController::class, 'recordClient']);

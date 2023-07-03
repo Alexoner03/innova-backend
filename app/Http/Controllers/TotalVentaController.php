@@ -24,16 +24,36 @@ class TotalVentaController extends Controller
         $this->connection = DB::connection($connectionLabel);
     }
 
+    public function indexSells(Request $request) {
+        $fields = $request->validate([
+            'cliente' => 'string|required|min:3',
+            'from' => 'string|required',
+            'to' => 'string|required',
+        ]);
+
+        return TotalVenta::whereIn("credito", ["CREDITO", "CANCELADO", "CONTADO"])
+            ->where("entregado", "SI")
+            ->where("cliente", $fields["cliente"])
+            ->whereBetween("fecha", [$fields["from"],$fields["to"]])
+            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
+            ->orderBy('fecha', "DESC")
+            ->get();
+
+    }
+
     public function index(Request $request)
     {
 
         $fields = $request->validate([
-            'cliente' => 'string|nullable|min:3'
+            'cliente' => 'string|nullable|min:3',
         ]);
 
         $cliente = $fields["cliente"] ?? null;
 
+
         $query = TotalVenta::where("credito", "CREDITO")->where("entregado", "SI");
+
+
         $user = auth()->user();
 
         if ($user && $user->cargo !== "ADMIN") {
@@ -49,7 +69,12 @@ class TotalVentaController extends Controller
             }
         }
 
-        return response()->json($query->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')->get());
+        return response()->json($query
+            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
+            ->orderBy('fecha', "DESC")
+            ->get()
+        );
+
     }
 
     public function listDetail(Request $request)

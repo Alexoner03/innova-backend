@@ -18,6 +18,7 @@ class ClienteController extends Controller
         if($validated["type"] === "ruc") {
             return response()->json(
                 Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
+                    ->where("tipo", "FERRETERIA")
                     ->where("ruc", "like", "%".$validated["value"]."%")
                     ->where("activo", "<>", "ANULADO")
                     ->orderBy('cliente', "asc")
@@ -28,6 +29,7 @@ class ClienteController extends Controller
         $splitted = explode(" ", $validated["value"]);
 
         $query = Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
+                    ->where("tipo", "FERRETERIA")
                     ->where("activo", "<>", "ANULADO");
 
         foreach ($splitted as $word) {
@@ -41,6 +43,7 @@ class ClienteController extends Controller
         return response()->json(
             Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
                 ->where("activo", "<>", "ANULADO")
+                ->where("tipo", "FERRETERIA")
                 ->orderBy('cliente', "asc")
                 ->get()
         );
