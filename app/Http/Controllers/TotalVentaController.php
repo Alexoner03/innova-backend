@@ -14,12 +14,15 @@ use Illuminate\Database\Grammar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PDF;
 
 class TotalVentaController extends Controller
 {
     private readonly Connection $connection;
     public function __construct()
     {
+        if(str(request()->path())->contains("reporte")) return;
+
         $connectionLabel = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
         $this->connection = DB::connection($connectionLabel);
     }
@@ -111,6 +114,113 @@ class TotalVentaController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function reporte(Request $request)
+    {
+
+        $options = [
+            'innovaprincipal' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 20487211410',
+                'razon1' => 'INVERSIONES E IMPORTACIONES FERREBOOM S.R.L.',
+                'direccion1' => 'PROL. HUANUCO N° 258-A - HUANCAYO - HUANCAYO - JUNIN',
+                'direccion2' => 'PRINCIPAL: PROL. HUANUCO N° 258-A - HUANCAYO - HUANCAYO - JUNIN SUCURSAL: PROL. HUANUCO N° 272 - HUANCAYO - HUANCAYO - JUNIN',
+                'serie1' => '001',
+                'serie2' => '002',
+                'datos1' => 'CEL: 943322258 - 939747012 CORREO: innova.t1.huancayo@gmail.com',
+            ],
+            'castilla' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 20601765641',
+                'razon1' => 'GRUPO FERRETERO INNOVA S.R.L.',
+                'direccion1' => 'AV. MARISCAL CASTILLA NRO. 1704 URB. LAMBLASPATA - EL TAMBO - HUANCAYO - JUNIN',
+                'serie1' => '004',
+                'datos1' => 'CEL: 950543772 CORREO: innova.eltambo@gmail.com',
+            ],
+            'castilla2' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 20601765641',
+                'razon1' => 'GRUPO FERRETERO INNOVA S.R.L.',
+                'direccion1' => 'AV. MARISCAL CASTILLA NRO. 2075 URB. LAMBLASPATA - EL TAMBO - HUANCAYO - JUNIN',
+                'serie1' => '006',
+                'datos1' => 'CEL: 950543772 CORREO: innova.eltambo@gmail.com',
+            ],
+            'jauja' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 20609257076',
+                'razon1' => 'INVERSIONES FERRETERA INNOVA S.A.C.',
+                'direccion1' => 'AV. RICARDO PALMA N° 251 - JAUJA - JAUJA - JUNIN',
+                'serie1' => '001',
+                'datos1' => 'CEL: 924681501 CORREO: innovajauja251@gmail.com',
+            ],
+            'almacenayacucho' => [
+                'logo1' => 'logo_ferreboom.jpg',
+                'ruc1' => 'RUC: 20609697041',
+                'razon1' => 'FERREBOOM AYACUCHO S.A.C.',
+                'direccion1' => 'AV. JAVIER PEREZ DE CUELLAR S/N - AYACUCHO - HUAMANGA - AYACUCHO',
+                'serie1' => '001',
+                'datos1' => 'CEL: 901143148 - 970583609 BCP: CUENTA CORRIENTE 220-3661490-0-68',
+            ],
+            'ferreboomlima' => [
+                'logo1' => 'logo_ferreboom.jpg',
+                'ruc1' => 'RUC: 20610184236',
+                'razon1' => 'DISTRIBUIDORA FERREBOOM S.A.C.',
+                'direccion1' => 'CAL.CHIAPPE LUIS NRO. 643 OTR. CERCADO LIMA - LIMA - LA VICTORIA',
+                'serie1' => '001',
+                'datos1' => 'CEL: 976525333 BCP: CUENTA CORRIENTE ',
+            ],
+            'vanidositos' => [
+                'logo1' => 'logo_vanidositos.jpeg',
+                'ruc1' => 'RUC: 10443630088',
+                'razon1' => 'MELGAR POVEZ PAOLA ANGELINA',
+                'direccion1' => 'JR. TOMAS GUIDO N° 509 INT. 1A - HUANCAYO - HUANCAYO - JUNIN',
+                'serie1' => '001',
+                'datos1' => 'CEL: 949978487 - 999050145',
+            ],
+            'vanidositosbebom' => [
+                'logo1' => 'logo_vanidositos.jpeg',
+                'ruc1' => 'RUC: 20610504613',
+                'razon1' => 'VANIDOSITOS MODA INFANTIL S.A.C.',
+                'direccion1' => 'JR. TOMAS GUIDO NRO. 509 HUANCAYO CERCADO JUNIN - HUANCAYO - HUANCAYO',
+                'serie1' => '001',
+                'datos1' => 'CEL: 949978487 - 999050145',
+            ],
+            'pichari' => [
+                'logo1' => 'logo_clamel.jpeg',
+                'ruc1' => 'RUC: 20608596136',
+                'razon1' => 'DISTRIBUIDORA FERRETERA CL & M S.A.C.',
+                'direccion1' => 'CASTAÑA NRO. 156 - CUSCO - LA CONVENCION - PICHARI',
+                'serie1' => '001',
+                'datos1' => 'CEL: 925828845 CORREO: ferre.clamel@gmail.com',
+            ],
+            'tingomaria' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 10198351054',
+                'razon1' => 'DORIS POVEZ SOTO',
+                'direccion1' => 'AV. ANTONIO RAIMONDI N° 513 - RUPA - RUPA - LEONCIO PRADO - HUANUCO',
+                'serie1' => '001',
+                'datos1' => 'CEL: 986872868 CORREO: innova.tingomaria1@gmail.com',
+            ],
+            'chupaca' => [
+                'logo1' => 'logo_innova.png',
+                'ruc1' => 'RUC: 20601488567',
+                'razon1' => 'CENTRO COMERCIAL FERRETERO LA PRINCIPAL S.R.L.',
+                'direccion1' => 'JR. RUFINO ECHENIQUE NRO. 543 P.J. CHUPACA JUNIN - CHUPACA - CHUPACA',
+                'serie1' => '001',
+                'datos1' => 'CEL: 945793616',
+            ],
+        ];
+
+
+        $imagePath = public_path("logo_aquady.jpeg");
+        $image = "data:image/png;base64,".base64_encode(file_get_contents($imagePath));
+
+//        return view('reporte');
+        $pdf = PDF::loadView('reporte',[
+            'logo' => $image
+        ]);
+        return $pdf->stream();
     }
 
     function store(Request $request)
