@@ -194,10 +194,17 @@ class TotalVentaController extends Controller
     public function listDetail(Request $request)
     {
         $fields = $request->validate([
-            'serie' => 'string'
+            'serie' => 'string',
+            'tipo' => 'string'
         ]);
 
-        $details = NotaPedido::where('serienota', $fields['serie'])->get();
+        $details = $this->getRegister($fields["tipo"], $fields["serie"]);
+        $details = [];
+
+        if(str($fields["tipo"])){
+
+        }
+
         $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
 
         $result = [];
