@@ -16,24 +16,29 @@ class ClienteController extends Controller
         ]);
 
         if($validated["type"] === "ruc") {
-            return response()->json(
-                Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
-                    ->where("tipo", "FERRETERIA")
-                    ->where("ruc", "like", "%".$validated["value"]."%")
-                    ->where("activo", "<>", "ANULADO")
-                    ->orderBy('cliente', "asc")
-                    ->get()
-            );
+
+            $rucQuery = Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
+                ->where("ruc", "like", "%".$validated["value"]."%")
+                ->where("activo", "<>", "ANULADO");
+
+            if($request->has("ferretero")){
+                $rucQuery->whereIn("tipo", ["FERRETERIA", "CONSTRUCTORA"]);
+            }
+
+            return response()->json($rucQuery->orderBy('cliente', "asc")->get());
         }
 
         $splitted = explode(" ", $validated["value"]);
 
         $query = Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
-                    ->where("tipo", "FERRETERIA")
                     ->where("activo", "<>", "ANULADO");
 
         foreach ($splitted as $word) {
             $query->where("cliente", "like", "%" . $word . "%");
+        }
+
+        if($request->has("ferretero")){
+            $query->whereIn("tipo", ["FERRETERIA", "CONSTRUCTORA"]);
         }
 
         return response()->json($query->orderBy('cliente', "asc")->get());
@@ -43,7 +48,6 @@ class ClienteController extends Controller
         return response()->json(
             Cliente::select('id_cliente', 'cliente', 'direccion', 'ruc')
                 ->where("activo", "<>", "ANULADO")
-                ->where("tipo", "FERRETERIA")
                 ->orderBy('cliente', "asc")
                 ->get()
         );
