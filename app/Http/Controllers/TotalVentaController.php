@@ -199,13 +199,11 @@ class TotalVentaController extends Controller
         ]);
 
         $details = $this->getRegister($fields["tipo"], $fields["serie"]);
-        $details = [];
+        $details2 = [];
 
-        if(str($fields["tipo"])){
-
+        if(str($fields["tipo"])->contains("PEDIDO")){
+            $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
         }
-
-        $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
 
         $result = [];
 

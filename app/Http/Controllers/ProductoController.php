@@ -55,22 +55,12 @@ class ProductoController extends Controller
     }
 
     public function history(Request $request) {
-        $fields = $request->validate([
-           ""
-        ]);
-    }
 
-    private function getRegister(String $type, String $serie) {
-        return match ($type) {
-            "FACTURA" =>                Factura::where("seriefactura", $serie)->get(),
-            "FACTURA ELECTRONICA" =>    FacturaElectronica::where("seriefactura", $serie)->get(),
-            "FACTURA ELECTRONICA 2" =>  FacturaElectronica2::where("seriefactura", $serie)->get(),
-            "BOLETA DE VENTA" =>        Boleta::where("serieboleta", $serie)->get(),
-            "BOLETA ELECTRONICA" =>     BoletaElectronica::where("serieboleta", $serie)->get(),
-            "BOLETA ELECTRONICA 2" =>   BoletaElectronica2::where("serieboleta", $serie)->get(),
-            "NOTA DE PEDIDO" =>         NotaPedido::where("serienota", $serie)->get(),
-            "NOTA DE PEDIDO 2" =>       NotaPedido2::where("serienota", $serie)->get(),
-            default => [],
-        };
+        $fields = $request->validate([
+           "serie" => 'string|required'
+        ]);
+
+
+
     }
 }
