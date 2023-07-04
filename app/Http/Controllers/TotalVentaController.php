@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Boleta;
+use App\Models\BoletaElectronica;
+use App\Models\BoletaElectronica2;
 use App\Models\Cliente;
 use App\Models\Devolucion;
+use App\Models\Factura;
+use App\Models\FacturaElectronica;
+use App\Models\FacturaElectronica2;
 use App\Models\NotaPedido;
+use App\Models\NotaPedido2;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\TotalPedido;
@@ -14,111 +21,17 @@ use Illuminate\Database\Grammar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Luecano\NumeroALetras\NumeroALetras;
 use PDF;
 
 class TotalVentaController extends Controller
 {
     private readonly Connection $connection;
+    private readonly array $config;
     public function __construct()
     {
-        if(str(request()->path())->contains("reporte")) return;
-
         $connectionLabel = request()->has("db") ? request()->get("db") : auth()->payload()->get('BASE');
         $this->connection = DB::connection($connectionLabel);
-    }
-
-    public function indexSells(Request $request) {
-        $fields = $request->validate([
-            'cliente' => 'string|required|min:3',
-            'from' => 'string|required',
-            'to' => 'string|required',
-        ]);
-
-        return TotalVenta::whereIn("credito", ["CREDITO", "CANCELADO", "CONTADO"])
-            ->where("entregado", "SI")
-            ->where("cliente", $fields["cliente"])
-            ->whereBetween("fecha", [$fields["from"],$fields["to"]])
-            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
-            ->orderBy('fecha', "DESC")
-            ->get();
-
-    }
-
-    public function index(Request $request)
-    {
-
-        $fields = $request->validate([
-            'cliente' => 'string|nullable|min:3',
-        ]);
-
-        $cliente = $fields["cliente"] ?? null;
-
-
-        $query = TotalVenta::where("credito", "CREDITO")->where("entregado", "SI");
-
-
-        $user = auth()->user();
-
-        if ($user && $user->cargo !== "ADMIN") {
-            $query = $query->where("vendedor", auth()->user()->nombre);
-        }
-
-        if (!!$cliente && $cliente !== "")
-        {
-            $splitted = explode(" ", $cliente);
-
-            foreach ($splitted as $word) {
-                $query->where("cliente", "like", "%" . $word . "%");
-            }
-        }
-
-        return response()->json($query
-            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
-            ->orderBy('fecha', "DESC")
-            ->get()
-        );
-
-    }
-
-    public function listDetail(Request $request)
-    {
-        $fields = $request->validate([
-            'serie' => 'string'
-        ]);
-
-        $details = NotaPedido::where('serienota', $fields['serie'])->get();
-        $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
-
-        $result = [];
-
-        foreach ($details as $item) {
-            $result[] = [
-                "cantidad" =>   $item->cantidad,
-                "producto" =>   $item->producto,
-                "unitario" =>   $item->unitario,
-                "importe" =>    $item->importe,
-                "id" =>         $item->id,
-                "estado" =>     "normal",
-            ];
-        }
-
-        foreach ($details2 as $item) {
-            $result[] = [
-                "cantidad" =>   $item->cantidad,
-                "producto" =>   $item->producto,
-                "unitario" =>   $item->unitario,
-                "importe" =>    $item->importe,
-                "id" =>         $item->id,
-                "estado" =>     "devolucion",
-            ];
-        }
-
-        return response()->json($result);
-    }
-
-    public function reporte(Request $request)
-    {
-
         $options = [
             'innovaprincipal' => [
                 'logo1' => 'logo_innova.png',
@@ -211,15 +124,135 @@ class TotalVentaController extends Controller
                 'datos1' => 'CEL: 945793616',
             ],
         ];
+        $this->config = array_key_exists($connectionLabel, $options) ? $options[$connectionLabel] : $options["innovaprincipal"];
+    }
 
-
-        $imagePath = public_path("logo_aquady.jpeg");
-        $image = "data:image/png;base64,".base64_encode(file_get_contents($imagePath));
-
-//        return view('reporte');
-        $pdf = PDF::loadView('reporte',[
-            'logo' => $image
+    public function indexSells(Request $request) {
+        $fields = $request->validate([
+            'cliente' => 'string|required|min:3',
+            'from' => 'string|required',
+            'to' => 'string|required',
         ]);
+
+        return TotalVenta::whereIn("credito", ["CREDITO", "CANCELADO", "CONTADO"])
+            ->where("entregado", "SI")
+            ->where("cliente", $fields["cliente"])
+            ->whereBetween("fecha", [$fields["from"],$fields["to"]])
+            ->whereIn("documento", [
+//                "FACTURA",
+                "FACTURA ELECTRONICA",
+                "FACTURA ELECTRONICA 2",
+//                "BOLETA DE VENTA",
+                "BOLETA ELECTRONICA",
+                "BOLETA ELECTRONICA 2",
+                "NOTA DE PEDIDO",
+                "NOTA DE PEDIDO 2",
+            ])
+            ->where("cliente", "<>", "Devolución")
+            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
+            ->orderBy('fecha', "DESC")
+            ->get();
+
+    }
+
+    public function index(Request $request)
+    {
+
+        $fields = $request->validate([
+            'cliente' => 'string|nullable|min:3',
+        ]);
+
+        $cliente = $fields["cliente"] ?? null;
+
+
+        $query = TotalVenta::where("credito", "CREDITO")->where("entregado", "SI");
+
+
+        $user = auth()->user();
+
+        if ($user && $user->cargo !== "ADMIN") {
+            $query = $query->where("vendedor", auth()->user()->nombre);
+        }
+
+        if (!!$cliente && $cliente !== "")
+        {
+            $splitted = explode(" ", $cliente);
+
+            foreach ($splitted as $word) {
+                $query->where("cliente", "like", "%" . $word . "%");
+            }
+        }
+
+        return response()->json($query
+            ->select('cliente', 'fecha', 'fechapago', 'vendedor', 'total', 'pendiente', 'acuenta', 'serieventas', 'documento')
+            ->orderBy('fecha', "DESC")
+            ->get()
+        );
+
+    }
+
+    public function listDetail(Request $request)
+    {
+        $fields = $request->validate([
+            'serie' => 'string'
+        ]);
+
+        $details = NotaPedido::where('serienota', $fields['serie'])->get();
+        $details2 = Devolucion::where('seriedevolucion', $fields['serie'])->get();
+
+        $result = [];
+
+        foreach ($details as $item) {
+            $result[] = [
+                "cantidad" =>   $item->cantidad,
+                "producto" =>   $item->producto,
+                "unitario" =>   $item->unitario,
+                "importe" =>    $item->importe,
+                "id" =>         $item->id,
+                "estado" =>     "normal",
+            ];
+        }
+
+        foreach ($details2 as $item) {
+            $result[] = [
+                "cantidad" =>   $item->cantidad,
+                "producto" =>   $item->producto,
+                "unitario" =>   $item->unitario,
+                "importe" =>    $item->importe,
+                "id" =>         $item->id,
+                "estado" =>     "devolucion",
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+    public function reporte(Request $request)
+    {
+
+        $fields = $request->validate([
+           'serie' => 'string|required',
+           'tipo' => 'string|required'
+        ]);
+
+        $imagePath = public_path($this->config["logo1"]);
+        $image = "data:image/png;base64,".base64_encode(file_get_contents($imagePath));
+        $registers = $this->getRegister($fields["tipo"],$fields["serie"]);
+        $model = TotalVenta::where('serieventas',$fields["serie"])->where('documento', $fields["tipo"])->first();
+        $total = $registers->reduce(fn($carry, $item) => $carry + $item->importe, 0);
+        $formatter = new NumeroALetras();
+        $qrdata = $this->constructQrlabel($model, $total);
+
+        $pdf = PDF::loadView('reporte',[
+            'logo' => $image,
+            'config' => $this->config,
+            'model' => $model,
+            'registers' =>$registers,
+            'total' => $total,
+            'resumen' => $formatter->toMoney($total, 2, 'NUEVOS SOLES', 'CENTIMOS'),
+            'qrdata' => $qrdata
+        ]);
+
         return $pdf->stream();
     }
 
@@ -369,5 +402,35 @@ class TotalVentaController extends Controller
         }
 
         return response()->json($totals);
+    }
+
+    private function getRegister(String $type, String $serie) {
+        return match ($type) {
+            "FACTURA" =>                Factura::where("seriefactura", $serie)->get(),
+            "FACTURA ELECTRONICA" =>    FacturaElectronica::where("seriefactura", $serie)->get(),
+            "FACTURA ELECTRONICA 2" =>  FacturaElectronica2::where("seriefactura", $serie)->get(),
+            "BOLETA DE VENTA" =>        Boleta::where("serieboleta", $serie)->get(),
+            "BOLETA ELECTRONICA" =>     BoletaElectronica::where("serieboleta", $serie)->get(),
+            "BOLETA ELECTRONICA 2" =>   BoletaElectronica2::where("serieboleta", $serie)->get(),
+            "NOTA DE PEDIDO" =>         NotaPedido::where("serienota", $serie)->get(),
+            "NOTA DE PEDIDO 2" =>       NotaPedido2::where("serienota", $serie)->get(),
+            default => [],
+        };
+    }
+
+    private function constructQrlabel($model, $total) {
+        $ruc = $this->config["ruc1"].substr(5,11);
+        $serie = $this->config["serie1"];
+        $igv = $total * 0.18;
+
+        if(str($model->documento)->contains("FACTURA")) $type = "|01|F";
+        else if(str($model->documento)->contains("BOLETA")) $type = "|03|B";
+        else return "";
+
+        if(str($model->documento)->contains("FACTURA")) $docType = "|6|";
+        else if(str($model->documento)->contains("BOLETA")) $docType = "|1|";
+        else return "";
+
+        return $ruc.$type.$serie."|".$model->serieventas."|".$igv."|".$total."|".$model->fecha.$docType.$model->ruc;
     }
 }

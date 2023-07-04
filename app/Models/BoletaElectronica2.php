@@ -5,13 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NotaPedido extends Model
+class BoletaElectronica2 extends Model
 {
     use HasFactory;
-
-    protected $table = "notapedido";
-    protected $primaryKey = "idnota";
-
+    protected $table  = "boletaelectronica2";
+    protected $primaryKey = "idboleta";
     protected $guarded = [];
 
     public function __construct(array $attributes = [])

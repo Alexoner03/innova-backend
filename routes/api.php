@@ -78,5 +78,6 @@ Route::group([
 
     Route::get("/reporte-cliente", [TotalVentaController::class, 'recordClient']);
     Route::get("/reporte-vendedor", [TotalVentaController::class, 'recordSeller']);
+    Route::get("/reporte", [TotalVentaController::class, 'reporte']);
 
 });
