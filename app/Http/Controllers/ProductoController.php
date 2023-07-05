@@ -68,7 +68,7 @@ class ProductoController extends Controller
         $compras = Compra::where("entregado", "SI")
             ->where("id", $fields["id"])
             ->orderBy("fecha", "desc")
-            ->select("fecha", "cantidad", "producto", "unitario", "billete")
+            ->select("fecha", "cantidad", "producto", "unitario", "billete", "proveedor")
             ->limit(10)
             ->get();
 
@@ -130,7 +130,10 @@ class ProductoController extends Controller
                 ...$factElec2,
                 ...$boletaElec,
                 ...$boletaElec2,
-            ]);
+            ])
+                ->sortByDesc ("fecha", SORT_DESC)
+                ->values()
+                ->all();
         }
 
         return response()->json([
