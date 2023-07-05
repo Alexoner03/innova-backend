@@ -74,7 +74,8 @@ class ProductoController extends Controller
 
         $ventas = collect();
 
-        if(!$fields["cliente"] || $fields["cliente"] !== "") {
+        if($fields["cliente"] !== "" && !!$fields["cliente"]) {
+            dd($fields["cliente"]);
             $pedidos = NotaPedido::where("id", $fields["id"])
                 ->where($this->connection->raw("TRIM(cliente)"), str($fields["cliente"])->trim())
                 ->where("entregado", "SI")
