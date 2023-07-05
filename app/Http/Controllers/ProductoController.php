@@ -69,19 +69,18 @@ class ProductoController extends Controller
             ->where("id", $fields["id"])
             ->orderBy("fecha", "desc")
             ->select("fecha", "cantidad", "producto", "unitario", "billete")
-            ->limit(3)
+            ->limit(10)
             ->get();
 
         $ventas = collect();
 
         if($fields["cliente"] !== "" && !!$fields["cliente"]) {
-            dd($fields["cliente"]);
             $pedidos = NotaPedido::where("id", $fields["id"])
                 ->where($this->connection->raw("TRIM(cliente)"), str($fields["cliente"])->trim())
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $pedidos2 = NotaPedido2::where("id", $fields["id"])
@@ -89,7 +88,7 @@ class ProductoController extends Controller
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $factElec = FacturaElectronica::where("id", $fields["id"])
@@ -97,7 +96,7 @@ class ProductoController extends Controller
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $factElec2 = FacturaElectronica2::where("id", $fields["id"])
@@ -105,7 +104,7 @@ class ProductoController extends Controller
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $boletaElec = BoletaElectronica::where("id", $fields["id"])
@@ -113,7 +112,7 @@ class ProductoController extends Controller
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $boletaElec2 = BoletaElectronica2::where("id", $fields["id"])
@@ -121,7 +120,7 @@ class ProductoController extends Controller
                 ->where("entregado", "SI")
                 ->select("fecha", "cantidad", "producto", "unitario")
                 ->orderBy("fecha", "desc")
-                ->limit(3)
+                ->limit(10)
                 ->get();
 
             $ventas = collect([
