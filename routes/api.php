@@ -58,6 +58,7 @@ Route::group([
 
     Route::get('/filter', [ProductoController::class, 'filter']);
     Route::get('/', [ProductoController::class, 'listAll']);
+    Route::get('/history', [ProductoController::class, 'history']);
 
 });
 
