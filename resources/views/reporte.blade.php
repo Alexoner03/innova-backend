@@ -101,7 +101,6 @@
                 {{ str($model->documento)->contains("BOLETA") ? "B" : "F"}}{{$config["serie1"]."-".$model->serieventas}}
             </p>
             @endif
-
         </div>
         <hr>
 
@@ -156,7 +155,7 @@
             </thead>
             <tbody>
 
-            @foreach($registers as $key => $register)
+            @foreach($registers as $register)
                 <tr style="font-size: 13px; text-align: center">
                     <td>{{$register->cantidad}}</td>
                     <td style="text-align: left">{{$register->producto}}</td>

@@ -90,6 +90,7 @@ return [
         'clientepichari04' => $getdb("clientepichari04"),
         'clientepichari05' => $getdb("clientepichari05"),
         'innovaprincipal_bkp' => $getdb("innovaprincipal_bkp"),
+        'almacenhuancayo' => $getdb("almacenhuancayo"),
 
         'pgsql' => [
             'driver' => 'pgsql',

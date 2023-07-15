@@ -346,7 +346,8 @@ class TotalVentaController extends Controller
                 "result" => true,
                 "message" => $next_serie
             ]);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             Log::error($e);
             $this->connection->rollBack();
             return response()->json([
