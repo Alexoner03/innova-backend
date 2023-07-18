@@ -291,7 +291,7 @@ class TotalVentaController extends Controller
 
         //total de la venta
         $total = collect($validated["products"])->reduce(function (int $curr, $item) {
-            return $curr + ($item["price"] * $item["cant"]);
+            return $curr + (doubleval($item["price"]) * intval($item["cant"]));
         }, 0);
 
 
@@ -308,9 +308,9 @@ class TotalVentaController extends Controller
             $totalPedido->cliente = $client->cliente;
             $totalPedido->direccion = $client->direccion;
             $totalPedido->entregado = 'NO';
-            $totalPedido->subtotal = $total;
+            $totalPedido->subtotal = $total."";
             $totalPedido->devolucion = "0.00";
-            $totalPedido->total = $total;
+            $totalPedido->total = $total."";
             $totalPedido->vendedor = $user->nombre;
             $totalPedido->comentario = $validated["comment"] ?? "";
             $totalPedido->credito = $client->credito;
@@ -326,8 +326,8 @@ class TotalVentaController extends Controller
                 $pedido->compra = $productRegister->p_compra;
                 $pedido->producto = $productRegister->producto . " " . $productRegister->marca;
                 $pedido->cantidad = $product["cant"];
-                $pedido->unitario = $product["price"];
-                $pedido->importe = $product["cant"] * $product["price"];
+                $pedido->unitario = doubleval($product["price"]);
+                $pedido->importe = intval($product["cant"]) * doubleval($product["price"]);
                 $pedido->especial = $productRegister->p_promotor;
                 $pedido->ruc = $client->ruc;
                 $pedido->cliente = $client->cliente;
