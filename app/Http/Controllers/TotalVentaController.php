@@ -289,11 +289,14 @@ class TotalVentaController extends Controller
 
         $client = Cliente::where('id_cliente', $validated["client"])->first();
 
+        $total = 0;
         //total de la venta
-        $total = collect($validated["products"])->reduce(function (int $curr, $item) {
-            return $curr + (doubleval($item["price"]) * intval($item["cant"]));
-        }, 0);
+        $products = collect($validated["products"]);
 
+        //se cambió de reduce a foreach porque presenta un error con la suma de doubles
+        foreach ($products as $product){
+            $total += (doubleval($product["price"]) * intval($product["cant"]));
+        }
 
         $this->connection->beginTransaction();
 
