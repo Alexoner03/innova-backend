@@ -267,6 +267,8 @@ class TotalVentaController extends Controller
         $validated = $request->validate([
             "comment" => "string|nullable",
             "client" => "numeric|required",
+            "isNewClient" => "boolean|required",
+            "newClientData" => "array|nullable",
             "products" => "required|array|min:1",
             "products.*.cant" => "numeric|required",
             "products.*.id" => "numeric|required",
@@ -287,7 +289,16 @@ class TotalVentaController extends Controller
         $lastTotalPedido = TotalPedido::where('seriepedido', $lastSeriePedido[0]->max)->first();
         $nro_pedido = $lastTotalPedido->fecha === date('Y-m-d') ? $lastTotalPedido->nropedido + 1 : 1; //esto debería ser un autoincremente pero bueno...
 
-        $client = Cliente::where('id_cliente', $validated["client"])->first();
+        if($validated["isNewClient"]){
+            $words = $validated["newClientData"];
+            $client = new Cliente();
+            $client->cliente = str($words[0])->upper();
+            $client->ruc = str($words[1])->upper();
+            $client->direccion = str($words[2])->upper();
+            $client->credito = 0;
+        }else {
+            $client = Cliente::where('id_cliente', $validated["client"])->first();
+        }
 
         $total = 0;
         //total de la venta
