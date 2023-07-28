@@ -292,9 +292,9 @@ class TotalVentaController extends Controller
         if($validated["isNewClient"]){
             $words = $validated["newClientData"];
             $client = new Cliente();
-            $client->cliente = str($words[0])->upper();
-            $client->ruc = str($words[1])->upper();
-            $client->direccion = str($words[2])->upper();
+            $client->cliente = str($words[0] ?? "")->upper();
+            $client->ruc = str($words[1] ?? "")->upper();
+            $client->direccion = str($words[2] ?? "")->upper();
             $client->credito = 0;
         }else {
             $client = Cliente::where('id_cliente', $validated["client"])->first();
