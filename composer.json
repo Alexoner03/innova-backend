@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.8",
         "luecano/numero-a-letras": "3.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "twilio/sdk": "^7.7",
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
