@@ -1,9 +1,9 @@
 version: "3.8"
 services:
-    app:
+    app-dev:
         build:
             context: ./
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile-dev
         image: innova
         container_name: innova-dev
         restart: unless-stopped
@@ -13,7 +13,7 @@ services:
         networks:
             - app_net
 
-    nginx:
+    nginx-dev:
         image: nginx:alpine
         container_name: innova-nginx-dev
         restart: unless-stopped
