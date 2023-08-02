@@ -21,7 +21,7 @@ services:
             - "8000:80"
         volumes:
             - ./:/var/www
-            - ./docker-compose/nginx:/etc/nginx/conf.d/
+            - ./docker-compose/nginx-dev:/etc/nginx/conf.d/
         networks:
             - app_net
 

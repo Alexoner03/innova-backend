@@ -18,7 +18,7 @@ services:
     container_name: innova-nginx
     restart: unless-stopped
     ports:
-      - "8001:80"
+      - "8001:81"
     volumes:
       - ./:/var/www
       - ./docker-compose/nginx:/etc/nginx/conf.d/
