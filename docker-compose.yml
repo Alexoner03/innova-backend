@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+    app:
+        build:
+            args:
+                user: innova_platform
+                uid: 1000
+            context: ./
+            dockerfile: Dockerfile
+        image: innova
+        container_name: innova-dev
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        networks:
+            - app_net
+
+    nginx:
+        image: nginx:alpine
+        container_name: travellist-nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d/
+        networks:
+            - app_net
+
+networks:
+    app_net:
+        external: true
