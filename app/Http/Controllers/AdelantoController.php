@@ -34,24 +34,28 @@ class AdelantoController extends Controller
         return response()->json($results);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
-            "adelantos" =>              "array|required|min:1",
-            "adelantos.*.pendiente" =>  "required|numeric|min:0",
-            "adelantos.*.acuenta" =>    "required|numeric|min:0",
-            "adelantos.*.cliente" =>    "required|string",
-            "adelantos.*.serie" =>      "required|string",
-            "adelantos.*.documento" =>  "required|string",
-            "adelantos.*.firma" =>      "required|string",
-            "adelantos.*.pagante" =>    "string|nullable",
+            "adelantos" => "array|required|min:1",
+            "adelantos.*.pendiente" => "required|numeric|min:0",
+            "adelantos.*.acuenta" => "required|numeric|min:0",
+            "adelantos.*.cliente" => "required|string",
+            "adelantos.*.serie" => "required|string",
+            "adelantos.*.documento" => "required|string",
+            "adelantos.*.firma" => "required|string",
+            "adelantos.*.pagante" => "string|nullable",
         ]);
 
         $this->connection->beginTransaction();
+        $signs = [];
+        $buyers = [];
 
         try {
-            foreach ($validated["adelantos"] as $adelanto)
-            {
+            foreach ($validated["adelantos"] as $adelanto) {
                 $signName = $this->storeImage($adelanto["firma"]);
+                $signs[] = $signName;
+                $buyers[] = $adelanto["pagante"] ?? "";
 
                 $acuenta = new ACuenta();
                 $acuenta->serie = $adelanto["serie"];
@@ -67,12 +71,12 @@ class AdelantoController extends Controller
                 $acuenta->save();
             }
             $this->connection->commit();
-            $this->notifyOrders($validated["adelantos"]);
+            $this->notifyOrders($validated["adelantos"], $signs, $buyers);
             return response()->json([
                 "result" => true,
             ]);
 
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->connection->rollBack();
             Log::error($e);
             return response()->json([
@@ -82,18 +86,18 @@ class AdelantoController extends Controller
         }
     }
 
-    private function storeImage(String $image_64): string
+    private function storeImage(string $image_64): string
     {
         $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];   // .jpg .png .pdf
 
-        $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+        $replace = substr($image_64, 0, strpos($image_64, ',') + 1);
 
         // find substring from replace here eg: data:image/png;base64,
         $image = str_replace($replace, '', $image_64);
 
         $image = str_replace(' ', '+', $image);
         $datetime = date('d_m_Y_H_i_s');
-        $imageName = str()->random(10).'_'.$datetime.'.'.$extension;
+        $imageName = str()->random(10) . '_' . $datetime . '.' . $extension;
         Storage::disk('public')->put($imageName, base64_decode($image));
         return $imageName;
     }
@@ -101,21 +105,37 @@ class AdelantoController extends Controller
     /**
      * @throws ConfigurationException
      */
-    private function notifyOrders(array $advacements): void {
+    private function notifyOrders(array $advacements, array $signs, array $buyers): void
+    {
 
-        $sid =  env('TWILIO_AUTH_SID');
-        $token =  env('TWILIO_AUTH_TOKEN');
-        $from =  env('TWILIO_WHATSAPP_FROM');
+        $sid = env('TWILIO_AUTH_SID');
+        $token = env('TWILIO_AUTH_TOKEN');
+        $from = env('TWILIO_WHATSAPP_FROM');
 
         $twilio = new Client($sid, $token);
 
-        foreach ($advacements as $advacement){
-            $message = $twilio->messages
-                ->create("whatsapp:+51985850285",
+        $count = 0;
+        foreach ($advacements as $advacement) {
+            $file = $signs[$count];
+            $buyer = $buyers[$count];
+
+            $message = "Se registro su adelanto con éxito, le adjuntamos la imagen con la firma. ";
+
+            if ($buyer !== "") {
+                $message .=  $buyer ." realizo el pago.";
+            }
+
+            $message .= " muchas gracias. Atte: " . auth()->user()->nombre;
+
+            $twilio->messages
+                ->create("whatsapp:+51960536426",
                     array(
                         "from" => $from,
-                        "body" => "Tu adelanto de {$advacement['acuenta']} por el pedido {$advacement['serie']} ha sido guardado"
+                        "body" => $message,
+                        "mediaUrl" => [url("/storage/" . $file)]
                     ));
+
+            $count++;
         }
     }
 }
