@@ -12,15 +12,13 @@ services:
             - ./:/var/www
         networks:
             - app_net
-        environment:
-            - PORT='s/9000/9000/'
 
     nginx:
         image: nginx:alpine
         container_name: innova-nginx
         restart: unless-stopped
         ports:
-            - "8001:80"
+            - "8000:80"
         volumes:
             - ./:/var/www
             - ./docker-compose/nginx:/etc/nginx/conf.d/

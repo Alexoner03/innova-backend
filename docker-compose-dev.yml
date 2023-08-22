@@ -18,7 +18,7 @@ services:
         container_name: innova-nginx-dev
         restart: unless-stopped
         ports:
-            - "8000:80"
+            - "8001:80"
         volumes:
             - ./:/var/www
             - ./docker-compose/nginx-dev:/etc/nginx/conf.d/
