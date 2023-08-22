@@ -1,8 +1,9 @@
 FROM php:8.1-fpm
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV PORT 's/9000/9001/'
 
-RUN sed -i 's/9000/9001/' /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN sed -i PORT /usr/local/etc/php-fpm.d/zz-docker.conf
 
 WORKDIR /var/www
 

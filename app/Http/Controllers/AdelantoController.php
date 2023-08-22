@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ACuenta;
 use App\Models\Adelanto;
+use App\Models\Cliente;
 use Illuminate\Database\Connection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Twilio\Exceptions\ConfigurationException;
-use Twilio\Rest\Client;
 
 class AdelantoController extends Controller
 {
@@ -34,6 +35,84 @@ class AdelantoController extends Controller
         return response()->json($results);
     }
 
+    public function notifyAddvacement(Request $request) {
+        $validated = $request->validate([
+            "firma" => "required|string",
+            "pagante" => "required|string",
+            "cliente" => "required|string"
+        ]);
+
+//        $cliente = Cliente::where("cliente", $validated["cliente"])->first();
+//
+//        if($cliente == null || $cliente->celular == null || $cliente->celular == "") {
+//            return response()->json([
+//                "result" => false,
+//                "message" => "Cliente no tiene numero de contacto"
+//            ], 422);
+//        }
+
+        $signName = $this->storeImage($validated["firma"]);
+        $buyer = $validated["pagante"];
+
+        $message = "Se ha registrado un nuevo adelanto con éxito, le adjuntamos la imagen con la firma. ";
+
+        if ($buyer !== "") {
+            $message .=  $buyer ." realizó el pago.";
+        }
+
+        $message .= " muchas gracias. Atte: " . auth()->user()->nombre;
+
+        Http::post("http://190.117.60.67:3001/lead", [
+            "message"   => $message,
+            "phone" => "51960536426",
+            "media" => url("/storage/" . $signName)
+        ]);
+
+        return response()->json([
+            "result" => true,
+            "message" => "ok",
+            "file" => $signName
+        ]);
+    }
+
+    public function deleteAdvacement(Request $request) {
+        $validated = $request->validate([
+            "firma" => "required|string",
+            "pagante" => "required|string",
+            "monto" => "required|numeric"
+        ]);
+
+        $cliente = "Alexander";
+//        $cliente = Cliente::where("cliente", $validated["cliente"])->first();
+//
+//        if($cliente == null || $cliente->celular == null || $cliente->celular == "") {
+//            return response()->json([
+//                "result" => false,
+//                "message" => "Cliente no tiene numero de contacto"
+//            ], 422);
+//        }
+
+        $file = public_path('storage/'.$validated["firma"]);
+
+        if(file_exists($file)){
+            unlink($file);
+        }else {
+            return response()->json([
+                "result" => false,
+                "file" => "Firma no encontrada"
+            ]);
+        }
+
+        Http::post("http://190.117.60.67:3001/lead", [
+            "message"   => "{$cliente}, Su ultimo adelanto por S/. {$validated["monto"]} ha sido cancelado",
+            "phone" => "51960536426",
+        ]);
+
+        return response()->json([
+            "result" => true,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -48,15 +127,9 @@ class AdelantoController extends Controller
         ]);
 
         $this->connection->beginTransaction();
-        $signs = [];
-        $buyers = [];
 
         try {
             foreach ($validated["adelantos"] as $adelanto) {
-                $signName = $this->storeImage($adelanto["firma"]);
-                $signs[] = $signName;
-                $buyers[] = $adelanto["pagante"] ?? "";
-
                 $acuenta = new ACuenta();
                 $acuenta->serie = $adelanto["serie"];
                 $acuenta->vendedor = auth()->user()->nombre;
@@ -65,13 +138,12 @@ class AdelantoController extends Controller
                 $acuenta->fecha = date("Y-m-d");
                 $acuenta->pendiente = "SI";
                 $acuenta->documento = $adelanto["documento"];
-                $acuenta->firma = $signName;
+                $acuenta->firma = $adelanto["firma"];
                 $acuenta->pagante = $adelanto["pagante"] ?? "";
 
                 $acuenta->save();
             }
             $this->connection->commit();
-            $this->notifyOrders($validated["adelantos"], $signs, $buyers);
             return response()->json([
                 "result" => true,
             ]);
@@ -100,42 +172,5 @@ class AdelantoController extends Controller
         $imageName = str()->random(10) . '_' . $datetime . '.' . $extension;
         Storage::disk('public')->put($imageName, base64_decode($image));
         return $imageName;
-    }
-
-    /**
-     * @throws ConfigurationException
-     */
-    private function notifyOrders(array $advacements, array $signs, array $buyers): void
-    {
-
-        $sid = env('TWILIO_AUTH_SID');
-        $token = env('TWILIO_AUTH_TOKEN');
-        $from = env('TWILIO_WHATSAPP_FROM');
-
-        $twilio = new Client($sid, $token);
-
-        $count = 0;
-        foreach ($advacements as $advacement) {
-            $file = $signs[$count];
-            $buyer = $buyers[$count];
-
-            $message = "Se registro su adelanto con éxito, le adjuntamos la imagen con la firma. ";
-
-            if ($buyer !== "") {
-                $message .=  $buyer ." realizo el pago.";
-            }
-
-            $message .= " muchas gracias. Atte: " . auth()->user()->nombre;
-
-            $twilio->messages
-                ->create("whatsapp:+51960536426",
-                    array(
-                        "from" => $from,
-                        "body" => $message,
-                        "mediaUrl" => [url("/storage/" . $file)]
-                    ));
-
-            $count++;
-        }
     }
 }
